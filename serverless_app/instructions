@@ -1,0 +1,62 @@
+1- DynamoDB
+creating a table named : devops-raffle which partition key is email(string)
+table properties: class is DynamoDB Standard-IA
+                  capacity_mode is on-demand
+.................................................................................................................
+2- lambda functions 
+we will have 3 functions for (apply_raffle,count_raffle,draw_raffle) but first we will create an IAM role which will used 
+by this fuctions named raffle-role and has (AmazonDynamoDBFullAccess,AWSLambdaDynamoDBExecutionRole,AWSLambdaInvocation-DynamoDB,CloudWatchLogsFullAccess)
+policies 
+the code of this functions is in .js files
+
+Once testing this functions that will affect on the devops-raffle table
+.................................................................................................................
+3- Api Getway
+    a- creating domain name (in my case i don't have an aws one instead of it i have a GoDaddy one named ata-devops.online
+    to use it in aws i have created a hostedZone with the same name but i took the name servers in NS record and pate it 
+    in GoDaddy namesrves  see Domain pictures)
+    b- create ACM certificate :
+            Fully qualified domain name : api.ata-devops.online
+            Validation method: DNS validation
+            Key algorithm: RSA 2048
+        after creating it in Domains Create records in Route 53 that will validate you are the author of that domain
+    c- creatin the api GW:
+        1-  type: http
+            name: raffle
+            stage_name: dev
+        2- after creating in Custom domain names put the domain name which you generate certificate to it "api.ata-devops.online"
+           and then choose ACM certificate that you did "as in the pics"
+        3- api_mapping: as in the pic 
+        4- creatin record in hostedzone for this GW to link the domain with the gw endpoint as in pics
+    d- connecting the lambda functions with the api gw attach all routes with it's functions
+.................................................................................................................
+4- a- enabling mutual tls authentication for api Getway : download OppenSSl from https://slproweb.com/products/Win32OpenSSL.html "Win64 OpenSSL v3.3.1 Light
+EXE "  and then install it then follow instructions with https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/
+   b- creating a s3 bucket named "devops90-ca-api-getway" and put "RootCA.pem" in it
+      then take S3 URI "s3://devops90-ca-api-getway/RootCA.pem" and in api-gw "Custom domain names" put it in "Mutual TLS authentication"
+      as pics
+  c- in cli : openssl pkcs12 -export -inkey my_client.key -in my_client.pem -out my_client.p12"this will import the certificates in the browser"
+.................................................................................................................
+5- hosting html pages on s3"don't allow https" and cloudfront
+   a- s3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html
+   b- cloudfront: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/getting-started-cloudfront-overview.html
+   See CROS pics
+   c- creatin ACM certificate for cloudfront without subdomain
+   d- create cloudfront as pics
+   e- make a record to it in the hostedzone and the alias to cloudfront
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             
